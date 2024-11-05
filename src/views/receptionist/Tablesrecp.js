@@ -1,7 +1,6 @@
-// Tables.js
 import React, { useEffect, useState } from "react";
 import CardTable from "components/Cards/CardTableRecep.js";
- 
+
 const Tablesrecp = () => {
   const [user, setUser] = useState([]);
   const [visitorsMap, setVisitorsMap] = useState(new Map());
@@ -18,10 +17,15 @@ const Tablesrecp = () => {
 
   useEffect(() => {
     const userId = localStorage.getItem('userId');
+    const token = localStorage.getItem('token'); // Get token from localStorage
 
     const fetchUser = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/users/${userId}`);
+        const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`, // Include token in headers
+          },
+        });
         const data = await response.json();
         setUser(data);
         if (!data.email || !data.emailPassword) {
@@ -37,30 +41,39 @@ const Tablesrecp = () => {
     fetchUser();
   }, []);
 
-// Fetch and filter active visitors (checked-out visitors removed)
-const fetchVisitors = async (query = '') => {
-  try {
-    const response = await fetch(`http://localhost:5000/api/visitors?query=${query}`);
-    if (response.ok) {
-      const data = await response.json();
-      const activeVisitors = data.filter(visitor => visitor.status !== 'checked-out');
-      setVisitorsMap(new Map(activeVisitors.map(visitor => [visitor._id, visitor])));
-    } else {
+  // Fetch and filter active visitors (checked-out visitors removed)
+  const fetchVisitors = async (query = '') => {
+    const token = localStorage.getItem('token'); // Get token from localStorage
+    try {
+      const response = await fetch(`http://localhost:5000/api/visitors?query=${query}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`, // Include token in headers
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const activeVisitors = data.filter(visitor => visitor.status !== 'checked-out');
+        setVisitorsMap(new Map(activeVisitors.map(visitor => [visitor._id, visitor])));
+      } else {
+        alert('Error fetching visitors');
+      }
+    } catch (error) {
+      console.error('Error fetching visitors:', error);
       alert('Error fetching visitors');
     }
-  } catch (error) {
-    console.error('Error fetching visitors:', error);
-    alert('Error fetching visitors');
-  }
-};
+  };
 
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
     const userId = localStorage.getItem('userId');
+    const token = localStorage.getItem('token'); // Get token from localStorage
     try {
       const response = await fetch(`http://localhost:5000/api/users/${userId}/updateEmail`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Include token in headers
+        },
         body: JSON.stringify(emailData),
       });
       if (response.ok) {
@@ -84,12 +97,16 @@ const fetchVisitors = async (query = '') => {
       alert('Visitor has already checked out and cannot check in again.');
       return;
     }
-  
+
     try {
       const receptionistId = localStorage.getItem('userId');
+      const token = localStorage.getItem('token'); // Get token from localStorage
       const response = await fetch(`http://localhost:5000/api/visitors/${visitorId}/checkin`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Include token in headers
+        },
         body: JSON.stringify({ receptionistId }),
       });
       if (response.ok) {
@@ -113,10 +130,14 @@ const fetchVisitors = async (query = '') => {
       alert('Visitor has already checked out.');
       return;
     }
-  
+
     try {
+      const token = localStorage.getItem('token'); // Get token from localStorage
       const response = await fetch(`http://localhost:5000/api/visitors/${visitorId}/checkout`, {
         method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`, // Include token in headers
+        },
       });
       if (response.ok) {
         alert('Visitor checked out successfully');
@@ -131,11 +152,10 @@ const fetchVisitors = async (query = '') => {
 
   return (
     <>
-       <div className=" bg-lightBlue-600 md:pt-64">
-        </div>
-      <div className=" min-h-screen">
+      <div className="bg-lightBlue-600 md:pt-64"></div>
+      <div className="min-h-screen">
         <div className="container pr-4 pl-4 -mt-40">
-           <input
+          <input
             type="text"
             placeholder="Search Visitor by Name"
             value={searchQuery}
@@ -143,12 +163,12 @@ const fetchVisitors = async (query = '') => {
             className="border p-2 rounded mt-5"
           />
           <button
-            className= "text-lightBlue-600  px-4 py-2 z-50 bg-white mb-5 ml-6 rounded-md border-2 border-blue-400"
+            className="text-lightBlue-600 px-4 py-2 z-50 bg-white mb-5 ml-6 rounded-md border-2 border-blue-400"
             onClick={() => fetchVisitors(searchQuery)}
           >
             Search
           </button>
-       
+
           <CardTable
             visitors={Array.from(visitorsMap.values())}
             onCheckIn={handleCheckIn}

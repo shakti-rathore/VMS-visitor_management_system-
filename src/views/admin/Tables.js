@@ -14,20 +14,31 @@ export default function Tables() {
 
   useEffect(() => {
     const userId = localStorage.getItem('userId');
-    if (!localStorage.getItem('role')) {
+    const role = localStorage.getItem('role');
+    const token = localStorage.getItem('token');
+
+    if (!role || !token) {
       window.location.href = 'https://iotcom.io/';
     }
 
     // Fetch visits for the logged-in host
-    loadVisits(userId);
+    loadVisits(userId, token);
 
     // Check if the logged-in host has an email
-    checkForEmail(userId);
+    checkForEmail(userId, token);
   }, []);
 
-  const loadVisits = async (userId) => {
+  const loadVisits = async (userId, token) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/visitors?hostId=${userId}`);
+      const response = await fetch(`http://localhost:5000/api/visitors?hostId=${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const visitsData = await response.json();
       console.log(visitsData);  
       setVisitors(visitsData);
@@ -36,9 +47,17 @@ export default function Tables() {
     }
   };
 
-  const checkForEmail = async (userId) => {
+  const checkForEmail = async (userId, token) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/users/${userId}`);
+      const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const user = await response.json();
       if (!user.email || !user.emailPassword) {
         setEmailModalVisible(true);
@@ -51,17 +70,21 @@ export default function Tables() {
   const handleVisitorSubmit = async (e) => {
     e.preventDefault();
     const hostId = localStorage.getItem('userId');
+    const token = localStorage.getItem('token');
     try {
       const response = await fetch('http://localhost:5000/api/visitorss', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ ...visitorData, hostId }),
       });
       if (response.ok) {
         alert('Visitor successfully registered');
         setVisitorModalVisible(false);
         setVisitorData({ name: '', contact: '', visitDate: '', reason: '' });
-        loadVisits(hostId); // Refresh visit list
+        loadVisits(hostId, token); // Refresh visit list
       } else {
         alert('Error registering visitor');
       }
@@ -72,26 +95,25 @@ export default function Tables() {
 
   return (
     <>
-      <div className=" bg-lightBlue-600 md:pt-64     ">
-        
+      <div className="bg-lightBlue-600 md:pt-64">
+        {/* Add any other content or styles here */}
       </div>
+
       {/* Debugging modal visibility */}
       {console.log("Visitor Modal Visible State:", visitorModalVisible)}
 
       {/* Button to trigger the visitor registration modal */}
-     
-
       <div className="flex flex-wrap -mt-36 ">
-        <div className="w-full  px-4 ">
-           <button
-  className=" text-lightBlue-600 px-4 py-2 z-50 bg-white mb-5  rounded-md border-2 border-blue-400"
-  onClick={() => {
-    console.log("Button clicked!");
-    setVisitorModalVisible(true);
-  }}
->
-  Register New Visitor
-</button>
+        <div className="w-full px-4 ">
+          <button
+            className="text-lightBlue-600 px-4 py-2 z-50 bg-white mb-5 rounded-md border-2 border-blue-400"
+            onClick={() => {
+              console.log("Button clicked!");
+              setVisitorModalVisible(true);
+            }}
+          >
+            Register New Visitor
+          </button>
           <CardTable visitors={visitors} />
         </div>
       </div>
