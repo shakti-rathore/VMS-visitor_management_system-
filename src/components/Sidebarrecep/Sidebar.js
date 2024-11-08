@@ -1,12 +1,13 @@
-/*eslint-disable*/
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom"; // Import useLocation hook
 
 import NotificationDropdown from "components/Dropdowns/NotificationDropdown.js";
 import UserDropdown from "components/Dropdowns/UserDropdown.js";
 
 export default function Sidebar() {
   const [collapseShow, setCollapseShow] = React.useState("hidden");
+  const location = useLocation(); // Get the current location from the router
+
   return (
     <>
       <nav className="md:left-0 md:block md:fixed md:top-0 md:bottom-0 md:overflow-y-auto md:flex-row md:flex-nowrap md:overflow-hidden shadow-xl bg-white flex flex-wrap items-center justify-between relative md:w-64 z-10 py-4 px-6">
@@ -64,68 +65,52 @@ export default function Sidebar() {
                 </div>
               </div>
             </div>
-            {/* Form */}
-            <form className="mt-6 mb-4 md:hidden">
-              <div className="mb-3 pt-0">
-                <input
-                  type="text"
-                  placeholder="Search"
-                  className="border-0 px-3 py-2 h-12 border border-solid  border-blueGray-500 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-base leading-snug shadow-none outline-none focus:outline-none w-full font-normal"
-                />
-              </div>
-            </form>
 
             {/* Divider */}
             <hr className="my-4 md:min-w-full" />
             {/* Heading */}
             <h6 className="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
-              Admin Layout Pages
+              Receptionist Layout Pages
             </h6>
             {/* Navigation */}
-
             <ul className="md:flex-col md:min-w-full flex flex-col list-none">
-            <li className="items-center">
-    <Link
+              <li className="items-center">
+              <Link
       className={
         "text-xs uppercase py-3 font-bold block " +
-        (window.location.href.indexOf("/receptionist/dashboardrecp") !== -1
+        (location.pathname === "/receptionist/dashboardrecp"
           ? "text-lightBlue-500 hover:text-lightBlue-600"
           : "text-blueGray-700 hover:text-blueGray-500")
       }
       to="/receptionist/dashboardrecp"
     >
-      <i
-        className={
-          "fas fa-tv mr-2 text-sm " +
-          (window.location.href.indexOf("/receptionist/dashboardrecp") !== -1
-            ? "opacity-75"
-            : "text-blueGray-300")
-        }
-      ></i>{" "}
-      Dashboard
+      <i className={
+        "fas fa-tv mr-2 text-sm " +
+        (location.pathname === "/receptionist/dashboardrecp"
+          ? "opacity-75"
+          : "text-blueGray-300")
+      }></i> Dashboard
     </Link>
-  </li>
+              </li>
 
-  <li className="items-center">
-    <Link
-      className={
-        "text-xs uppercase py-3 font-bold block " +
-        (window.location.href.indexOf("/receptionist/tablesrecp") !== -1
-          ? "text-lightBlue-500 hover:text-lightBlue-600"
-          : "text-blueGray-700 hover:text-blueGray-500")
-      }
-      to="/receptionist/tablesrecp"
-    >
-      <i
-        className={
-          "fas fa-table mr-2 text-sm " +
-          (window.location.href.indexOf("/receptionist/tablesrecp") !== -1
-            ? "opacity-75"
-            : "text-blueGray-300")
-        }
-      ></i>{" "}
-      Visitors
-    </Link>
+              <li className="items-center">
+                <Link
+                  className={`text-xs uppercase py-3 font-bold block ${
+                    location.pathname.includes("/receptionist/tablesrecp")
+                      ? "text-lightBlue-500 hover:text-lightBlue-600"
+                      : "text-blueGray-700 hover:text-blueGray-500"
+                  }`}
+                  to="/receptionist/tablesrecp"
+                >
+                  <i
+                    className={`fas fa-table mr-2 text-sm ${
+                      location.pathname.includes("/receptionist/tablesrecp")
+                        ? "opacity-75"
+                        : "text-blueGray-300"
+                    }`}
+                  ></i>{" "}
+                  Visitors
+                </Link>
                 {/* <Link
                   className={
                     "text-xs uppercase py-3 font-bold block " +

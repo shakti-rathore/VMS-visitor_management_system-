@@ -11,6 +11,8 @@
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@fortawesome/fontawesome-free": "5.15.3",
+    "@headlessui/react": "^2.2.0",
+    "@heroicons/react": "^2.1.5",
     "@mui/x-data-grid": "^7.22.0",
     "@mui/x-data-grid-generator": "^7.22.0",
     "@mui/x-data-grid-pro": "^7.22.0",

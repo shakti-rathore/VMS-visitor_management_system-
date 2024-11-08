@@ -1,12 +1,13 @@
-/*eslint-disable*/
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom"; // Use useLocation hook for dynamic routing
 
 import NotificationDropdown from "components/Dropdowns/NotificationDropdown.js";
 import UserDropdown from "components/Dropdowns/UserDropdown.js";
 
 export default function Sidebar() {
   const [collapseShow, setCollapseShow] = React.useState("hidden");
+  const location = useLocation(); // Hook to access current route location
+
   return (
     <>
       <nav className="md:left-0 md:block md:fixed md:top-0 md:bottom-0 md:overflow-y-auto md:flex-row md:flex-nowrap md:overflow-hidden shadow-xl bg-white flex flex-wrap items-center justify-between relative md:w-64 z-10 py-4 px-6">
@@ -64,6 +65,7 @@ export default function Sidebar() {
                 </div>
               </div>
             </div>
+
             {/* Form */}
             <form className="mt-6 mb-4 md:hidden">
               <div className="mb-3 pt-0">
@@ -82,51 +84,42 @@ export default function Sidebar() {
               Admin Layout Pages
             </h6>
             {/* Navigation */}
-
             <ul className="md:flex-col md:min-w-full flex flex-col list-none">
               <li className="items-center">
                 <Link
-                  className={
-                    "text-xs uppercase py-3 font-bold block " +
-                    (window.location.href.indexOf("/admin/dashboard") !== -1
+                  className={`text-xs uppercase py-3 font-bold block ${
+                    location.pathname.includes("/admin/dashboard")
                       ? "text-lightBlue-500 hover:text-lightBlue-600"
-                      : "text-blueGray-700 hover:text-blueGray-500")
-                  }
+                      : "text-blueGray-700 hover:text-blueGray-500"
+                  }`}
                   to="/admin/dashboard"
                 >
                   <i
-                    className={
-                      "fas fa-tv mr-2 text-sm " +
-                      (window.location.href.indexOf("/admin/dashboard") !== -1
+                    className={`fas fa-tv mr-2 text-sm ${
+                      location.pathname.includes("/admin/dashboard")
                         ? "opacity-75"
-                        : "text-blueGray-300")
-                    }
+                        : "text-blueGray-300"
+                    }`}
                   ></i>{" "}
                   Dashboard
                 </Link>
               </li>
 
               <li className="items-center">
-             
-              </li>
-
-              <li className="items-center">
                 <Link
-                  className={
-                    "text-xs uppercase py-3 font-bold block " +
-                    (window.location.href.indexOf("/admin/tables") !== -1
+                  className={`text-xs uppercase py-3 font-bold block ${
+                    location.pathname.includes("/admin/tables")
                       ? "text-lightBlue-500 hover:text-lightBlue-600"
-                      : "text-blueGray-700 hover:text-blueGray-500")
-                  }
+                      : "text-blueGray-700 hover:text-blueGray-500"
+                  }`}
                   to="/admin/tables"
                 >
                   <i
-                    className={
-                      "fas fa-table mr-2 text-sm " +
-                      (window.location.href.indexOf("/admin/tables") !== -1
+                    className={`fas fa-table mr-2 text-sm ${
+                      location.pathname.includes("/admin/tables")
                         ? "opacity-75"
-                        : "text-blueGray-300")
-                    }
+                        : "text-blueGray-300"
+                    }`}
                   ></i>{" "}
                   Visitors
                 </Link>

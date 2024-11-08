@@ -93,27 +93,25 @@ app.post('/api/register', async (req, res) => {
 
 // Login Route
  app.post('/api/login', async (req, res) => {
-  const { username, password, role } = req.body;
+    const { username, password } = req.body;
 
-  try {
-    // Find user by username and role
-    const user = await User.findOne({ username,password,role });
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+    try {
+        // Find the user by username and password
+        const user = await User.findOne({ username, password }); // password should ideally be hashed, as discussed
+
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        // Generate JWT token based on user role
+        const token = jwt.sign({ id: user._id, role: user.role }, 'your_jwt_secret', { expiresIn: '1h' });
+        
+        // Send response including user role to determine the interface
+        res.status(200).json({ message: 'Login successful', token, userId: user._id, role: user.role });
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).json({ message: 'Server error', error });
     }
-
-    // Directly compare entered password with stored password
-    if (password !== user.password) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-
-    // Generate JWT token
-    const token = jwt.sign({ id: user._id, role: user.role }, 'your_jwt_secret', { expiresIn: '1h' });
-    res.status(200).json({ message: 'Login successful', token, userId: user._id, role: user.role });
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ message: 'Server error', error });
-  }
 });
 
 

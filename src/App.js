@@ -1,6 +1,5 @@
-// App.js
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "assets/styles/tailwind.css";
@@ -12,35 +11,40 @@ import Login from "layouts/Login";
 import Profile from "views/Profile.js";
 
 // Authentication helper
-const isAuthenticated = () => {
+const getRole = () => {
   const token = localStorage.getItem('token');
   const role = localStorage.getItem('role');
   return token && role ? role : null;
 };
 
 const App = () => {
+  const role = getRole();
+  const location = useLocation();
+
+  // Ensure authenticated access only to the correct routes
   return (
     <Routes>
-      {/* Protected Admin Routes */}
-      <Route 
-        path="/admin/*" 
-        element={isAuthenticated() === 'host' ? <Admin /> : <Navigate to="/" />} 
-      />
-
-      {/* Protected Receptionist Route */}
-      <Route 
-        path="/receptionist/*" 
-        element={isAuthenticated() === 'receptionist' ? <Receptionist /> : <Navigate to="/" />} 
-      />
-
       {/* Login Route */}
-      <Route path="/" element={<Login />} />
+      <Route
+        path="/"
+        element={role ? <Navigate to={`/${role === 'host' ? 'admin' : 'receptionist'}/dashboard`} /> : <Login />}
+      />
 
-      {/* Other Routes */}
-      <Route path="/profile" element={<Profile />} />
+      {/* Admin Routes */}
+      {role === 'host' && (
+        <Route path="/admin/*" element={<Admin />} />
+      )}
 
-      {/* Fallback Route */}
-      <Route path="*" element={<Navigate to="/" />} />
+      {/* Receptionist Routes */}
+      {role === 'receptionist' && (
+        <Route path="/receptionist/*" element={<Receptionist />} />
+      )}
+
+      {/* Fallback Route to Handle Unauthorized Access */}
+      <Route
+        path="*"
+        element={<Navigate to={role ? `/${role === 'host' ? 'admin' : 'receptionist'}/dashboard` : "/"} replace />}
+      />
     </Routes>
   );
 };
